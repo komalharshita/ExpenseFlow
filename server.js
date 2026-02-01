@@ -20,6 +20,7 @@ const CronJobs = require('./services/cronJobs');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const { sanitizeInput, mongoSanitizeMiddleware } = require('./middleware/sanitization');
 const securityMonitor = require('./services/securityMonitor');
+const AuditMiddleware = require('./middleware/auditMiddleware');
 const protect = require("./middleware/authMiddleware");
 require('dotenv').config();
 
@@ -41,20 +42,24 @@ const io = socketIo(server, {
 
 const PORT = process.env.PORT || 3000;
 
+// Global audit interceptor (Issue #469)
+app.use(AuditMiddleware.auditInterceptor());
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com","https://api.github.com"],
       scriptSrc: [
         "'self'",
         "'unsafe-inline'",
         "https://cdn.socket.io",
-        "https://cdn.jsdelivr.net"
+        "https://cdn.jsdelivr.net",
+        "https://api.github.com"
       ],
       scriptSrcAttr: ["'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:", "https://res.cloudinary.com"],
+      imgSrc: ["'self'", "data:", "https:", "https://res.cloudinary.com","https://api.github.com"],
       connectSrc: [
         "'self'",
         "http://localhost:3000",
@@ -63,6 +68,7 @@ app.use(helmet({
         // APIs
         "https://api.exchangerate-api.com",
         "https://api.frankfurter.app",
+        "https://api.github.com",
 
         // Media
         "https://res.cloudinary.com",
@@ -221,6 +227,12 @@ io.on('connection', (socket) => {
   });
 });
 
+// Initialize Collaborative Handler for real-time workspaces
+const CollaborativeHandler = require('./socket/collabHandler');
+const collaborativeHandler = new CollaborativeHandler(io);
+collaborativeHandler.startPeriodicCleanup();
+console.log('Collaboration handler initialized');
+
 // Routes
 app.use('/api/auth', require('./middleware/rateLimiter').authLimiter, authRoutes);
 app.use('/api/currency', require('./routes/currency'));
@@ -241,6 +253,7 @@ app.use('/api/tax', protect, require('./routes/tax'));
 app.use('/api/bills', protect, require('./routes/bills'));
 app.use('/api/calendar', protect, require('./routes/calendar'));
 app.use('/api/reminders', protect, require('./routes/reminders'));
+app.use('/api/audit', protect, require('./routes/audit'));
 
 // Root route to serve the UI
 app.get('/', (req, res) => {
