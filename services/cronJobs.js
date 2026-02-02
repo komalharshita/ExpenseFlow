@@ -253,6 +253,24 @@ class CronJobs {
       await this.generateDailyInsights();
     });
 
+    // Daily forecast generation - Daily at 6 AM
+    cron.schedule('0 6 * * *', async () => {
+      console.log('[CronJobs] Generating daily forecasts...');
+      await this.generateDailyForecasts();
+    });
+
+    // Daily anomaly detection - Daily at 7 AM
+    cron.schedule('0 7 * * *', async () => {
+      console.log('[CronJobs] Running daily anomaly detection...');
+      await this.runDailyAnomalyDetection();
+    });
+
+    // Forecast accuracy update - Daily at 11 PM
+    cron.schedule('0 23 * * *', async () => {
+      console.log('[CronJobs] Updating forecast accuracy...');
+      await this.updateForecastAccuracy();
+    });
+
     console.log('Cron jobs initialized successfully');
   }
 

@@ -29,6 +29,9 @@ const expenseRoutes = require('./routes/expenses');
 const syncRoutes = require('./routes/sync');
 const splitsRoutes = require('./routes/splits');
 const groupsRoutes = require('./routes/groups');
+const clientRoutes = require('./routes/clients');
+const invoiceRoutes = require('./routes/invoices');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();
 const server = http.createServer(app);
