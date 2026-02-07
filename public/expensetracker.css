@@ -9339,3 +9339,153 @@ input:checked + .toggle-slider::before {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================
+   ENTERPRISE PROCUREMENT & FIXED ASSETS
+   Issue #574: Asset Lifecycle Management
+   ============================================ */
+
+.inventory-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.inventory-sidebar {
+    padding: 20px 10px;
+    height: fit-content;
+}
+
+.side-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 12px 15px;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-btn i { font-size: 1.1rem; }
+.nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.nav-btn.active { background: rgba(100, 255, 218, 0.1); color: var(--accent-primary); }
+
+.assets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.asset-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.asset-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.asset-icon.electronics { background: rgba(100, 255, 218, 0.15); color: #64ffda; }
+.asset-icon.furniture { background: rgba(72, 219, 251, 0.15); color: #48dbfb; }
+.asset-icon.machinery { background: rgba(255, 159, 67, 0.15); color: #ff9f43; }
+
+.asset-info h3 { margin: 0; font-size: 1.1rem; }
+.asset-serial { font-size: 0.75rem; color: var(--text-secondary); }
+
+.asset-value {
+    margin-top: 10px;
+}
+
+.asset-value label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); }
+.asset-value .value { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
+
+.asset-life {
+    margin-top: 5px;
+}
+
+.progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.progress { height: 100%; background: var(--accent-primary); }
+
+.asset-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 15px;
+}
+
+.status-pill {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+}
+
+.status-pill.active { color: #64ffda; }
+.status-pill.maintenance { color: #ff9f43; }
+
+/* Orders Table */
+.orders-table-container { padding: 10px; }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th { padding: 15px; border-bottom: 2px solid rgba(255,255,255,0.05); color: var(--text-secondary); font-size: 0.8rem; }
+.data-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+.os-pill { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; }
+.os-pill.draft { background: #34495e; }
+.os-pill.pending_approval { background: #d35400; }
+.os-pill.approved { background: #27ae60; }
+.os-pill.received { background: #2980b9; }
+
+/* PR Modal Custom */
+.items-editor {
+    margin-top: 20px;
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.item-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 120px 40px;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.item-row input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; color: white; }
+.remove-item { background: transparent; border: none; color: #ff6b6b; cursor: pointer; }
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-container { padding: 25px; }
+.chart-container h3 { margin-bottom: 20px; font-size: 1rem; color: var(--text-secondary); }
