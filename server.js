@@ -195,7 +195,8 @@ mongoose.connect(process.env.MONGODB_URI)
     // Initialize cron jobs after DB connection (includes backup scheduling)
     // Issue #462: Automated Backup System for Financial Data
     CronJobs.init();
-    console.log('✓ Cron jobs initialized (includes backup scheduling)');
+    require('./jobs/trendAnalyzer').start();
+    console.log('✓ Cron jobs initialized (Backup & Trend Analysis)');
   })
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -302,6 +303,7 @@ app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
 app.use('/api/treasury', require('./routes/treasury'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/maps', require('./routes/maps'));
+app.use('/api/security', require('./middleware/fraudGuard'), require('./routes/security'));
 
 // Import error handling middleware
 const { errorHandler, notFoundHandler } = require('./middleware/errorMiddleware');
