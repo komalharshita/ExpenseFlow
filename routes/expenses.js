@@ -8,6 +8,7 @@ const currencyService = require('../services/currencyService');
 const aiService = require('../services/aiService');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { prepareExpenseWithDisplayAmounts } = require('../utils/currencyUtils');
 const router = express.Router();
 
 const expenseSchema = Joi.object({
@@ -44,32 +45,10 @@ router.get('/', auth, async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // Convert expenses to user's preferred currency if needed
-    const convertedExpenses = await Promise.all(expenses.map(async (expense) => {
-      const expenseObj = expense.toObject();
-
-      // If expense currency differs from user preference, show converted amount
-      if (expenseObj.originalCurrency !== user.preferredCurrency) {
-        try {
-          const conversion = await currencyService.convertCurrency(
-            expenseObj.originalAmount,
-            expenseObj.originalCurrency,
-            user.preferredCurrency
-          );
-          expenseObj.displayAmount = conversion.convertedAmount;
-          expenseObj.displayCurrency = user.preferredCurrency;
-        } catch (error) {
-          // If conversion fails, use original amount
-          expenseObj.displayAmount = expenseObj.amount;
-          expenseObj.displayCurrency = expenseObj.originalCurrency;
-        }
-      } else {
-        expenseObj.displayAmount = expenseObj.amount;
-        expenseObj.displayCurrency = expenseObj.originalCurrency;
-      }
-
-      return expenseObj;
-    }));
+    // Convert expenses to user's preferred currency using utility function
+    const convertedExpenses = expenses.map(expense => 
+      prepareExpenseWithDisplayAmounts(expense, user.preferredCurrency)
+    );
 
     res.json({
       success: true,
