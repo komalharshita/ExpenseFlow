@@ -75,16 +75,14 @@ const memberSchema = new mongoose.Schema({
     required: true
   },
   role: {
-    type: String,
-    enum: ['owner', 'manager', 'editor', 'viewer'],
-    default: 'viewer'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role',
+    required: true
   },
-  permissions: {
-    type: [String],
-    default: function () {
-      return ROLE_PERMISSIONS[this.role] || ROLE_PERMISSIONS.viewer;
-    }
-  },
+  permissions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Permission'
+  }],
   customPermissions: [String], // Additional permissions beyond role
   restrictedPermissions: [String], // Permissions removed from role
   joinedAt: { type: Date, default: Date.now },
@@ -172,14 +170,13 @@ const workspaceSchema = new mongoose.Schema({
 
   members: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    role: { type: String, enum: ['admin', 'manager', 'member'], default: 'member' },
-    permissions: [String],
+    role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
     joinedAt: { type: Date, default: Date.now }
   }],
   inviteTokens: [{
     token: { type: String, required: true },
     email: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'manager', 'member'], default: 'member' },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
     invitedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     expiresAt: { type: Date, default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }, // 7 days
     used: { type: Boolean, default: false }
