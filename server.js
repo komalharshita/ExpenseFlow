@@ -11,6 +11,7 @@ process.on('uncaughtException', (err) => {
   // Optionally, perform cleanup or alerting here
 });
 const http = require('http');
+const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -288,7 +289,7 @@ app.use('/api/treasury', require('./routes/treasury'));
 app.use('/api/exports', require('./routes/exports'));
 app.use('/api/rbac', require('./routes/permissions'));
 app.use('/api/maps', require('./routes/maps'));
-app.use('/api/security', require('./middleware/fraudGuard'), require('./routes/security'));
+app.use('/api/sync', require('./middleware/syncInterceptor'), require('./routes/sync'));
 
 // Import error handling middleware
 const { errorHandler, notFoundHandler } = require('./middleware/errorMiddleware');
@@ -298,6 +299,9 @@ app.use(notFoundHandler);
 
 // Global error handler middleware (must be after all routes)
 app.use(errorHandler);
+
+// Initialize database connection
+connectDatabase();
 
 // Root route to serve the UI
 app.get('/', (req, res) => {
