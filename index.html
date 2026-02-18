@@ -2170,8 +2170,10 @@
             <a href="#dashboard" class="nav-link active">Dashboard</a>
             <a href="#analytics" class="nav-link">Analytics</a>
             <a href="#goals" class="nav-link">Goals</a>
+            <a href="#debt-tracker" class="nav-link">Debt Tracker</a>
             <a href="#settings" class="nav-link">Settings</a>
           </div>
+
           <div class="nav-actions">
             <div class="nav-search">
               <i class="fas fa-search"></i>
@@ -2608,8 +2610,341 @@
     </div>
   </div>
 
+  <!-- Debt Tracker Section -->
+  <section id="debt-tracker" class="debt-tracker-section">
+    <div class="container">
+      <div class="section-header">
+        <h3><i class="fas fa-money-check-alt"></i> Debt Tracker</h3>
+        <button class="add-debt-btn" id="add-debt-btn">
+          <i class="fas fa-plus"></i> Add Debt
+        </button>
+      </div>
+
+      <!-- Debt Summary Cards -->
+      <div class="debt-summary-grid">
+        <div class="debt-summary-card">
+          <div class="summary-icon">
+            <i class="fas fa-file-invoice-dollar"></i>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Debts</span>
+            <span class="summary-value" id="total-debts">0</span>
+          </div>
+        </div>
+        <div class="debt-summary-card">
+          <div class="summary-icon">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Balance</span>
+            <span class="summary-value" id="total-balance">₹0.00</span>
+          </div>
+        </div>
+        <div class="debt-summary-card">
+          <div class="summary-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Paid</span>
+            <span class="summary-value" id="total-paid">₹0.00</span>
+          </div>
+        </div>
+        <div class="debt-summary-card">
+          <div class="summary-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Monthly Payments</span>
+            <span class="summary-value" id="monthly-payments">₹0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payoff Progress -->
+      <div class="debt-progress-section">
+        <div class="progress-header">
+          <h4>Overall Payoff Progress</h4>
+          <span class="progress-percentage" id="payoff-progress">0%</span>
+        </div>
+        <div class="progress-bar-container large">
+          <div class="progress-bar" id="debt-progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="progress-stats">
+          <span>Avg Interest Rate: <strong id="avg-interest-rate">0%</strong></span>
+        </div>
+      </div>
+
+      <!-- Attention Needed -->
+      <div class="attention-section">
+        <h4><i class="fas fa-exclamation-triangle"></i> Attention Needed</h4>
+        <div id="attention-needed" class="attention-list">
+          <p class="no-alerts">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Payoff Strategy -->
+      <div class="strategy-section">
+        <div class="strategy-header">
+          <h4><i class="fas fa-lightbulb"></i> Payoff Recommendations</h4>
+          <select id="payoff-strategy" class="strategy-select">
+            <option value="avalanche">💰 Debt Avalanche (Highest Interest First)</option>
+            <option value="snowball">🏔️ Debt Snowball (Smallest Balance First)</option>
+          </select>
+        </div>
+        <div id="payoff-recommendations" class="recommendations-list">
+          <p class="loading-text">Select a strategy to see recommendations...</p>
+        </div>
+      </div>
+
+      <!-- Debt Filter Buttons -->
+      <div class="debt-filters">
+        <button class="debt-filter-btn active" data-filter="all">All Debts</button>
+        <button class="debt-filter-btn" data-filter="active">Active</button>
+        <button class="debt-filter-btn" data-filter="paid-off">Paid Off</button>
+        <button class="debt-filter-btn" data-filter="high-interest">High Interest</button>
+      </div>
+
+      <!-- Debts List -->
+      <div id="debts-list" class="debts-list">
+        <div class="empty-state">
+          <i class="fas fa-piggy-bank"></i>
+          <p>No debts found. Add your first debt to start tracking!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Debt Modal -->
+  <div id="debt-modal" class="modal debt-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="debt-modal-title"><i class="fas fa-plus-circle"></i> Add New Debt</h3>
+        <button class="modal-close-btn" onclick="debtTracker.closeModal(this.closest('.modal'))">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="debt-form" class="debt-form">
+        <input type="hidden" id="debt-id">
+        
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-name">Debt Name *</label>
+            <input type="text" id="debt-name" placeholder="e.g., Home Loan" required>
+          </div>
+          <div class="form-control">
+            <label for="debt-lender">Lender *</label>
+            <input type="text" id="debt-lender" placeholder="e.g., HDFC Bank" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-type">Loan Type *</label>
+            <select id="debt-type" required>
+              <option value="personal">Personal Loan</option>
+              <option value="mortgage">Mortgage / Home Loan</option>
+              <option value="auto">Auto Loan</option>
+              <option value="student">Student Loan</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="home_equity">Home Equity</option>
+              <option value="business">Business Loan</option>
+              <option value="medical">Medical Debt</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label for="debt-status">Status</label>
+            <select id="debt-status">
+              <option value="active">Active</option>
+              <option value="paid_off">Paid Off</option>
+              <option value="in_grace_period">Grace Period</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-principal">Original Principal (₹) *</label>
+            <input type="number" id="debt-principal" placeholder="100000" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-control">
+            <label for="debt-balance">Current Balance (₹) *</label>
+            <input type="number" id="debt-balance" placeholder="85000" step="0.01" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-interest-rate">Interest Rate (%) *</label>
+            <input type="number" id="debt-interest-rate" placeholder="8.5" step="0.01" min="0" max="100" required>
+          </div>
+          <div class="form-control">
+            <label for="debt-interest-type">Interest Type</label>
+            <select id="debt-interest-type">
+              <option value="compound">Compound</option>
+              <option value="simple">Simple</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-monthly-payment">Monthly Payment (₹) *</label>
+            <input type="number" id="debt-monthly-payment" placeholder="2500" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-control">
+            <label for="debt-minimum-payment">Minimum Payment (₹)</label>
+            <input type="number" id="debt-minimum-payment" placeholder="1000" step="0.01" min="0.01">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-start-date">Start Date *</label>
+            <input type="date" id="debt-start-date" required>
+          </div>
+          <div class="form-control">
+            <label for="debt-maturity-date">Maturity Date *</label>
+            <input type="date" id="debt-maturity-date" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="debt-priority">Priority</label>
+            <select id="debt-priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label for="debt-reminder-days">Reminder (days before)</label>
+            <input type="number" id="debt-reminder-days" value="3" min="0" max="30">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control checkbox-control">
+            <label class="checkbox-label">
+              <input type="checkbox" id="debt-auto-pay">
+              <span class="checkmark"></span>
+              Auto-pay enabled
+            </label>
+          </div>
+          <div class="form-control">
+            <label for="debt-account-number">Account Number</label>
+            <input type="text" id="debt-account-number" placeholder="Optional">
+          </div>
+        </div>
+
+        <div class="form-control full-width">
+          <label for="debt-notes">Notes</label>
+          <textarea id="debt-notes" rows="3" placeholder="Add any additional notes..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="debtTracker.closeModal(this.closest('.modal'))">Cancel</button>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i> Save Debt
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="payment-modal" class="modal payment-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-money-bill-wave"></i> Make Payment</h3>
+        <button class="modal-close-btn" onclick="debtTracker.closeModal(this.closest('.modal'))">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="payment-form" class="payment-form">
+        <div class="payment-info">
+          <div class="info-row">
+            <span class="info-label">Debt:</span>
+            <span class="info-value" id="payment-debt-name">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Current Balance:</span>
+            <span class="info-value" id="payment-current-balance">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Regular Payment:</span>
+            <span class="info-value" id="payment-monthly-payment">-</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="payment-amount">Payment Amount (₹) *</label>
+            <input type="number" id="payment-amount" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-control">
+            <label for="payment-date">Payment Date</label>
+            <input type="date" id="payment-date">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-control">
+            <label for="payment-method">Payment Method</label>
+            <select id="payment-method">
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="auto_draft">Auto Draft</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="debit_card">Debit Card</option>
+              <option value="check">Check</option>
+              <option value="cash">Cash</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-control checkbox-control">
+            <label class="checkbox-label">
+              <input type="checkbox" id="payment-is-extra">
+              <span class="checkmark"></span>
+              Extra payment (toward principal)
+            </label>
+          </div>
+        </div>
+
+        <div class="form-control full-width">
+          <label for="payment-notes">Notes</label>
+          <textarea id="payment-notes" rows="2" placeholder="Optional notes..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="debtTracker.closeModal(this.closest('.modal'))">Cancel</button>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-check"></i> Record Payment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Debt Details Modal -->
+  <div id="debt-details-modal" class="modal debt-details-modal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h3><i class="fas fa-info-circle"></i> Debt Details</h3>
+        <button class="modal-close-btn" onclick="debtTracker.closeModal(this.closest('.modal'))">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="debt-details-content" class="debt-details-content">
+        <p class="loading-text">Loading details...</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="footer">
+
     <div class="footer-container">
       <div class="footer-section">
         <div class="footer-logo">
@@ -2695,7 +3030,9 @@
   </footer>
 
   <script src="trackerscript.js"></script>
+  <script src="debt-tracker.js"></script>
   <script src="export-feature.js"></script>
+
 
   <!-- PWA Installation Prompt -->
   <div id="install-prompt" class="install-prompt" style="display: none;">
