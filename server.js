@@ -67,6 +67,7 @@ async function connectDatabase() {
         require('./jobs/trendAnalyzer').start();
         require('./jobs/reportScheduler').start();
         require('./jobs/accessAuditor').start();
+        require('./jobs/eventArchiver').start();
 
         console.log('✓ Cron jobs initialized');
       } catch (err) {
